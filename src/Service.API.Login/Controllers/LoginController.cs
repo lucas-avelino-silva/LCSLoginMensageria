@@ -54,7 +54,7 @@ namespace Service.API.Login.Controllers
 
                     var atvarContaModel = await _ativarContaAppService.Inserir(new AtivarContaViewModel((Guid)retorno.Id!, Guid.NewGuid()));
 
-                    var AtivacaoEvent = new AtivarContaEvent(login.Email!, $"{_configuration.GetSection("URLBase").Value}/AtivarConta/{atvarContaModel.Codigo}");
+                    var AtivacaoEvent = new AtivarContaEvent(login.Email!, $"{_configuration.GetSection("URLBase").Value}/Login/AtivarConta/{atvarContaModel.Codigo}");
 
                     _messageBusService.Publicar(AtivacaoEvent, "NotificarEmail");
 
