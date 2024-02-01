@@ -21,6 +21,7 @@ builder.Configuration
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ILoginApplicationService, LoginApplicationService>();
@@ -32,6 +33,8 @@ builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<IAtivarContaRepository, AtivarContaRepository>();
 
 builder.Services.AddScoped<IMessageBusService, RabbitMqService>();
+
+builder.Services.AddTransient<IEmailSettings, EmailSettings>();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 

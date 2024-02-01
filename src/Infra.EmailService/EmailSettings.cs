@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Infra.EmailService
 {
-    public class EmailSettings
+    public class EmailSettings : IEmailSettings
     {
         public string? PrimaryDomain { get; set; }
 

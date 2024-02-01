@@ -22,5 +22,9 @@ namespace Domain.Model
         public Guid Codigo { get; set; }
 
         public DateTime DataCriacao { get; set; }
+
+        public DateTime DataExpiracao { get; set; }
+
+        public LoginCadastroDomain? LoginDomain { get; set; }
     }
 }

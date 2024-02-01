@@ -71,5 +71,7 @@ namespace Domain.Model
         public DateTime? DataAtualizacao { get; set; }
 
         public bool? Ativado { get; set; } = false;
+
+        public List<AtivarContaDomain>? Codigos { get; set; }
     }
 }

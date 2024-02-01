@@ -22,6 +22,7 @@ namespace Application.ViewModel.Entity
             IdLogin = idLogin;
             Codigo = codigo;
             DataCriacao = DateTime.Now;
+            DataExpiracao = DataCriacao.AddDays(1);
         }
 
         public override bool IsValid()
@@ -49,6 +50,13 @@ namespace Application.ViewModel.Entity
                 valid = false;
             }
 
+            if (DataExpiracao.Date == new DateTime().Date)
+            {
+                AddNotifications($"Campo \"DataExpiracao\" inválido.");
+
+                valid = false;
+            }
+
             return valid;
         }
 
@@ -57,5 +65,7 @@ namespace Application.ViewModel.Entity
         public Guid Codigo { get; set; }
 
         public DateTime DataCriacao { get; set; }
+
+        public DateTime DataExpiracao { get; set; }
     }
 }

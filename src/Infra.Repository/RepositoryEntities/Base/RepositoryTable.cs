@@ -20,12 +20,16 @@ namespace Infra.Repository.RepositoryEntities.Base
         {
             await Task.Run(() => _context.Set<TableObject>().Update(tableObject));
 
+            await Salvar();
+
             return;
         }
 
         public async Task Deletar(TableObject tableObject)
         {
             await Task.Run(() => _context.Set<TableObject>().Remove(tableObject));
+
+            await Salvar();
 
             return;
         }

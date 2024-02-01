@@ -20,12 +20,15 @@ namespace Service.API.Login.Controllers
 
         private IMessageBusService _messageBusService;
 
-        public LoginController(ILoginApplicationService loginAppservice, IAtivarContaApplicationService ativarContaApp, IMessageBusService messageBusService, ILogger<LoginController> logger) : base(logger)
+        private IConfiguration _configuration;
+
+        public LoginController(ILoginApplicationService loginAppservice, IAtivarContaApplicationService ativarContaApp, IMessageBusService messageBusService, ILogger<LoginController> logger, IConfiguration configuration) : base(logger)
         {
             _loginAppService = loginAppservice;
             _ativarContaAppService = ativarContaApp;
             _messageBusService = messageBusService;
             _logger = logger;
+            _configuration = configuration;
         }
 
         [HttpPost("Cadastrar")]
@@ -51,7 +54,7 @@ namespace Service.API.Login.Controllers
 
                     var atvarContaModel = await _ativarContaAppService.Inserir(new AtivarContaViewModel((Guid)retorno.Id!, Guid.NewGuid()));
 
-                    var AtivacaoEvent = new AtivarContaEvent(login.Email!, atvarContaModel.Codigo.ToString());
+                    var AtivacaoEvent = new AtivarContaEvent(login.Email!, $"{_configuration.GetSection("URLBase").Value}/AtivarConta/{atvarContaModel.Codigo}");
 
                     _messageBusService.Publicar(AtivacaoEvent, "NotificarEmail");
 
@@ -99,15 +102,17 @@ namespace Service.API.Login.Controllers
                 {
                     var loginTemp = await _loginAppService.ObterPorEmail(login.Email!);
 
-                    if (!(bool)loginTemp!.Ativado!)
+                    if (!(bool)loginTemp?.Ativado!)
                     {
                         response.AddInformation(400, "Conta não ativada, verifique o seu e-mail.");
                     }
 
-                    if (loginTemp == null || loginTemp.Senha!.Equals(LibraryCrypt.HashMD5(login.Senha!)))
+                    if (loginTemp == null || !loginTemp.Senha!.Equals(LibraryCrypt.HashMD5(login.Senha!)))
                     {
-                        response.AddInformation(400, "Login ou senha incorreto.");
+                        response.AddInformation(400, "E-mail ou senha incorreto.");
                     }
+
+                    loginTemp!.Senha = "Ocultado";
 
                     response.SetContent(loginTemp);
                 }
@@ -159,6 +164,12 @@ namespace Service.API.Login.Controllers
 
                         return response.Response();
                     }
+                    else if(contaTemp.DataExpiracao < DateTime.Now)
+                    {
+                        response.AddInformation(400, "Código expirado.");
+
+                        return response.Response();
+                    }
 
                     var loginTemp = await _loginAppService.ObterPorId(contaTemp.IdLogin);
 
@@ -171,7 +182,7 @@ namespace Service.API.Login.Controllers
 
                     var ativacao = await _loginAppService.AtualizarConta(loginTemp);
 
-                    if (!ativacao)
+                    if (ativacao)
                     {
                         response.AddInformation(400, "Não foi possível ativar a conta.");
 

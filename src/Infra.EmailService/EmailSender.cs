@@ -5,14 +5,15 @@ using System.Net.Mail;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace Infra.EmailService
 {
     public class EmailSender : IEmailSender
     {
-        public EmailSender(EmailSettings emailSettings)
+        public EmailSender(IOptions<EmailSettings> emailSettings) //IEmailSettings emailSettings)
         {
-            _emailSettings = emailSettings;
+            _emailSettings = emailSettings.Value;
         }
 
         public EmailSettings _emailSettings { get; }
